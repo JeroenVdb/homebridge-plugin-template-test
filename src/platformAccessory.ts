@@ -62,11 +62,18 @@ export class ExamplePlatformAccessory {
      */
 
     // Example: add two "motion sensor" services to the accessory
-    const motionSensorOneService = this.accessory.getService('Motion Sensor One Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor One Name', 'YourUniqueIdentifier-1');
+    const motionSensorOneService = this.accessory.getService('Switch One Name') ||
+      this.accessory.addService(this.platform.Service.Switch, 'Switch One Name', 'YourUniqueIdentifier-1');
 
-    const motionSensorTwoService = this.accessory.getService('Motion Sensor Two Name') ||
-      this.accessory.addService(this.platform.Service.MotionSensor, 'Motion Sensor Two Name', 'YourUniqueIdentifier-2');
+    const motionSensorTwoService = this.accessory.getService('Switch Two Name') ||
+      this.accessory.addService(this.platform.Service.Switch, 'Switch Two Name', 'YourUniqueIdentifier-2');
+
+    motionSensorOneService.getCharacteristic(this.platform.Characteristic.On)
+        .onSet(this.setOn2.bind(this))                // SET - bind to the `setOn` method below
+        .onGet(this.getOn.bind(this));
+    motionSensorTwoService.getCharacteristic(this.platform.Characteristic.On)
+        .onSet(this.setOn2.bind(this))                // SET - bind to the `setOn` method below
+        .onGet(this.getOn.bind(this));
 
     /**
      * Updating characteristics values asynchronously.
@@ -77,18 +84,18 @@ export class ExamplePlatformAccessory {
      * the `updateCharacteristic` method.
      *
      */
-    let motionDetected = false;
-    setInterval(() => {
-      // EXAMPLE - inverse the trigger
-      motionDetected = !motionDetected;
-
-      // push the new value to HomeKit
-      motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
-      motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
-
-      this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
-      this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
-    }, 10000);
+    // let motionDetected = false;
+    // setInterval(() => {
+    //   // EXAMPLE - inverse the trigger
+    //   motionDetected = !motionDetected;
+    //
+    //   // push the new value to HomeKit
+    //   motionSensorOneService.updateCharacteristic(this.platform.Characteristic.MotionDetected, motionDetected);
+    //   motionSensorTwoService.updateCharacteristic(this.platform.Characteristic.MotionDetected, !motionDetected);
+    //
+    //   this.platform.log.debug('Triggering motionSensorOneService:', motionDetected);
+    //   this.platform.log.debug('Triggering motionSensorTwoService:', !motionDetected);
+    // }, 10000);
   }
 
   /**
@@ -100,6 +107,15 @@ export class ExamplePlatformAccessory {
     this.exampleStates.On = value as boolean;
 
     this.platform.log.debug('Set Characteristic On ->', value);
+  }  /**
+   * Handle "SET" requests from HomeKit
+   * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
+   */
+  async setOn2(value: CharacteristicValue) {
+    // implement your own code to turn your device on/off
+    this.exampleStates.On = value as boolean;
+
+    this.platform.log.debug('Set Characteristic On 2222 ->', value);
   }
 
   /**
